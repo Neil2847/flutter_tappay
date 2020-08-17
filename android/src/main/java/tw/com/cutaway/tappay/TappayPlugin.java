@@ -1,7 +1,6 @@
 package tw.com.cutaway.tappay;
 
 import android.content.Context;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
@@ -17,12 +16,14 @@ import tech.cherri.tpdirect.api.TPDCard;
 import tech.cherri.tpdirect.api.TPDCardValidationResult;
 import tech.cherri.tpdirect.api.TPDServerType;
 import tech.cherri.tpdirect.api.TPDSetup;
-import tw.com.cutaway.tappay.model.CardValid;
 
 /** TappayPlugin */
 public class TappayPlugin implements FlutterPlugin, MethodCallHandler {
 
   private static final String CHANNEL_NAME = "tappay/bridge";
+  private static final String INIT = "initTapPay";
+  private static final String VALID = "cardValid";
+  private static final String GET_TOKEN = "getDirectPayToken";
 
   private Context context;
   private MethodChannel channel;
@@ -52,14 +53,14 @@ public class TappayPlugin implements FlutterPlugin, MethodCallHandler {
   public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
 
     switch (call.method){
-      case "initTapPay":
+      case INIT:
         initTapPay(call.argument("appId"),call.argument("appKey"));
         break;
-      case "cardValid":
-        result.success(getCardValid(call.argument("cardNumber"),call.argument("dueMonth"),call.argument("dueYear"),call.argument("CCV")));
+      case VALID:
+        getCardValid(call.argument("cardNumber"),call.argument("dueMonth"),call.argument("dueYear"),call.argument("CCV"),result);
         break;
-      case "getDirectPayToken":
-        getDirectPayToken(call.argument("cardNumber"),call.argument("dueMonth"),call.argument("dueYear"),call.argument("CCV"));
+      case GET_TOKEN:
+        getDirectPayToken(call.argument("cardNumber"),call.argument("dueMonth"),call.argument("dueYear"),call.argument("CCV"),result);
         break;
       default:
         result.notImplemented();
@@ -85,30 +86,24 @@ public class TappayPlugin implements FlutterPlugin, MethodCallHandler {
   }
 
   // ----------------------------------
-  private CardValid getCardValid(String cardNumber, String dueMonth, String dueYear, String CCV){
-    TPDCardValidationResult result = TPDCard.validate(new StringBuffer(cardNumber), new StringBuffer(dueMonth), new StringBuffer(dueYear), new StringBuffer(CCV));
-    CardValid valid = new CardValid(true,"");
-    if (result.isCardNumberValid()){
-      valid = new CardValid(false,"Invalid Card Number");
-    }else if (result.isExpiryDateValid()){
-      valid = new CardValid(false,"Invalid Expiration Date");
-    }else if (result.isCCVValid()){
-      valid = new CardValid(false,"Invalid CCV");
+  private void getCardValid(String cardNumber, String dueMonth, String dueYear, String CCV,Result result){
+    TPDCardValidationResult validResult = TPDCard.validate(new StringBuffer(cardNumber), new StringBuffer(dueMonth), new StringBuffer(dueYear), new StringBuffer(CCV));
+    if (validResult.isCardNumberValid()){
+      result.error("-1","Invalid Card Number",null);
+    }else if (validResult.isExpiryDateValid()){
+      result.error("-1","Invalid Expiration Date",null);
+    }else if (validResult.isCCVValid()){
+      result.error("-1","Invalid CCV",null);
+    }else {
+      result.success(true);
     }
-
-    return valid;
   }
 
   // ----------------------------------
-  private void getDirectPayToken(String cardNumber, String dueMonth, String dueYear, String CCV){
-
+  private void getDirectPayToken(String cardNumber, String dueMonth, String dueYear, String CCV,Result result){
     TPDCard card = new TPDCard(context, new StringBuffer(cardNumber), new StringBuffer(dueMonth), new StringBuffer(dueYear), new StringBuffer(CCV))
-            .onSuccessCallback((prime, tpdCardInfo, cardIdentifier) -> {
-              Toast.makeText(context,"token1 :"+prime,Toast.LENGTH_LONG).show();
-            })
-            .onFailureCallback((status, reportMsg) -> {
-              Toast.makeText(context,"失敗 :"+reportMsg,Toast.LENGTH_LONG).show();
-            });
+            .onSuccessCallback((prime, tpdCardInfo, cardIdentifier) -> result.success(prime))
+            .onFailureCallback((status, reportMsg) -> result.error(String.valueOf(status),reportMsg,null));
 
     card.createToken("UNKNOWN");
   }

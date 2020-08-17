@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 
-import 'package:flutter/services.dart';
 import 'package:tappay/tappay.dart';
+import 'package:tappay/model/credit_card.dart';
 
 void main() {
   runApp(MyApp());
@@ -23,10 +23,15 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> initPlatformState() async {
     String platformVersion;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    try {
-      platformVersion = await Tappay.platformVersion;
-    } on PlatformException {
+
+    var tappa = Tappay();
+    tappa.initTapPay(0, '');
+    tappa.cardValid(CreditCard("", "", "", ""));
+
+    platformVersion = await tappa.getToken(CreditCard("", "", "", ""));
+
+    try {} catch (e) {
+      print('>>>> $e');
       platformVersion = 'Failed to get platform version.';
     }
 
