@@ -1,0 +1,22 @@
+PODS:
+  - Flutter (1.0.0)
+  - tappay (0.0.1):
+    - Flutter
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - tappay (from `.symlinks/plugins/tappay/ios`)
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  tappay:
+    :path: ".symlinks/plugins/tappay/ios"
+
+SPEC CHECKSUMS:
+  Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
+  tappay: da29954a4b2ad6653b93c9b9c9d10e267403918f
+
+PODFILE CHECKSUM: f32fb4e7c14f8b3ca19a369d7be425dd9241af27
+
+COCOAPODS: 1.9.3
