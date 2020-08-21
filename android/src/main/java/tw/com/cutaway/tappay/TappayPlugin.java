@@ -71,7 +71,7 @@ public class TappayPlugin implements FlutterPlugin, MethodCallHandler {
   // ----------------------------------
   @Override
   public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
-      dispose();
+    dispose();
   }
 
   // ----------------------------------

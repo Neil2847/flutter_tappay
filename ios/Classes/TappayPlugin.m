@@ -1,20 +1,16 @@
 #import "TappayPlugin.h"
+#if __has_include(<tappay/tappay-Swift.h>)
+#import <tappay/tappay-Swift.h>
+#else
+// Support project import fallback if the generated compatibility header
+// is not copied when this plugin is created as a library.
+// https://forums.swift.org/t/swift-static-libraries-dont-copy-generated-objective-c-header/19816
+#import "tappay-Swift.h"
+#import 
+#endif
 
 @implementation TappayPlugin
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
-  FlutterMethodChannel* channel = [FlutterMethodChannel
-      methodChannelWithName:@"tappay/bridge"
-            binaryMessenger:[registrar messenger]];
-  TappayPlugin* instance = [[TappayPlugin alloc] init];
-  [registrar addMethodCallDelegate:instance channel:channel];
+  [SwiftTappayPlugin registerWithRegistrar:registrar];
 }
-
-- (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
-  if ([@"getDirectPayToken" isEqualToString:call.method]) {
-    result([@"iOS " stringByAppendingString:[[UIDevice currentDevice] systemVersion]]);
-  } else {
-    result(FlutterMethodNotImplemented);
-  }
-}
-
 @end
