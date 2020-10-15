@@ -10,7 +10,7 @@ import TPDirect
   ) -> Bool {
     GeneratedPluginRegistrant.register(with: self)
     
-    TPDSetup.setWithAppId(123, withAppKey: "", with: TPDServerType.sandBox)
+    TPDSetup.setWithAppId(0, withAppKey: "", with: TPDServerType.sandBox)
 //    TPDSetup.shareInstance().setupIDFA(ASIdentifierManager.shared().advertisingIdentifier.uuidString)
     
     TPDSetup.shareInstance().serverSync()
