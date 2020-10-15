@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 
 import 'model/credit_card.dart';
 
-class Tappay {
+class TapPay {
   static const MethodChannel _channel = const MethodChannel('tappay/bridge');
 
   // -------------------------------------------

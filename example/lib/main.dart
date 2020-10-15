@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 
+import 'package:flutter/services.dart';
 import 'package:tappay/tappay.dart';
 import 'package:tappay/model/credit_card.dart';
 
@@ -16,27 +17,21 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   String _platformVersion = 'Unknown';
 
-  @override
-  void initState() {
-    super.initState();
-  }
-
   Future<void> initPlatformState() async {
     String platformVersion;
+    try {
+      var tappa = TapPay();
+      tappa.initTapPay(0,'');
+      tappa.cardValid(CreditCard("", "", "", ""));
 
-    var tappa = Tappay();
-    tappa.initTapPay(0, '');
-    tappa.cardValid(CreditCard("", "", "", ""));
-
-    platformVersion = await tappa.getToken(CreditCard("", "", "", ""));
-
-    try {} catch (e) {
-      print('>>>> $e');
+      platformVersion = await tappa
+          .getToken(CreditCard("", "", "", ""));
+    } catch (e) {
+      print('$e');
       platformVersion = 'Failed to get platform version.';
     }
 
     if (!mounted) return;
-
     setState(() {
       _platformVersion = platformVersion;
     });
@@ -53,7 +48,7 @@ class _MyAppState extends State<MyApp> {
                 onPressed: () {
                   initPlatformState();
                 },
-                child: Icon(Icons.add))
+                child: Icon(Icons.info))
           ],
         ),
         body: Center(

@@ -13,6 +13,7 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 import tech.cherri.tpdirect.api.TPDCard;
+import tech.cherri.tpdirect.api.TPDCardInfo;
 import tech.cherri.tpdirect.api.TPDCardValidationResult;
 import tech.cherri.tpdirect.api.TPDServerType;
 import tech.cherri.tpdirect.api.TPDSetup;
@@ -24,9 +25,12 @@ public class TappayPlugin implements FlutterPlugin, MethodCallHandler {
   private static final String INIT = "initTapPay";
   private static final String VALID = "cardValid";
   private static final String GET_TOKEN = "getDirectPayToken";
+  private static final String CARD_TYPE = "cardType";
+  private static final String LAST_FOUR = "lastFour";
 
   private Context context;
   private MethodChannel channel;
+  private TPDCardInfo cardInfo;
 
   // ----------------------------------
   public static void registerWith(Registrar registrar) {
@@ -54,13 +58,29 @@ public class TappayPlugin implements FlutterPlugin, MethodCallHandler {
 
     switch (call.method){
       case INIT:
-        initTapPay(call.argument("appId"),call.argument("appKey"));
+        if (hasValue(call,"appId","appKey")){
+          initTapPay(call.argument("appId"),call.argument("appKey"));
+        }
         break;
       case VALID:
-        getCardValid(call.argument("cardNumber"),call.argument("dueMonth"),call.argument("dueYear"),call.argument("CCV"),result);
+        if (hasValue(call,"cardNumber","dueMonth","dueYear","CCV")){
+          getCardValid(call.argument("cardNumber"),call.argument("dueMonth"),call.argument("dueYear"),call.argument("CCV"),result);
+        }
         break;
       case GET_TOKEN:
-        getDirectPayToken(call.argument("cardNumber"),call.argument("dueMonth"),call.argument("dueYear"),call.argument("CCV"),result);
+        if (hasValue(call,"cardNumber","dueMonth","dueYear","CCV")){
+          getDirectPayToken(call.argument("cardNumber"),call.argument("dueMonth"),call.argument("dueYear"),call.argument("CCV"),result);
+        }
+        break;
+      case CARD_TYPE:
+        if(cardInfo!=null){
+          result.success(cardInfo.getCardType());
+        }
+        break;
+      case LAST_FOUR:
+        if(cardInfo!=null){
+          result.success(cardInfo.getLastFour());
+        }
         break;
       default:
         result.notImplemented();
@@ -69,9 +89,21 @@ public class TappayPlugin implements FlutterPlugin, MethodCallHandler {
   }
 
   // ----------------------------------
+  boolean hasValue(MethodCall call,String ... keys){
+
+    for (String key:keys) {
+      if (!call.hasArgument(key)){
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  // ----------------------------------
   @Override
   public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
-      dispose();
+    dispose();
   }
 
   // ----------------------------------
@@ -102,8 +134,12 @@ public class TappayPlugin implements FlutterPlugin, MethodCallHandler {
   // ----------------------------------
   private void getDirectPayToken(String cardNumber, String dueMonth, String dueYear, String CCV,Result result){
     TPDCard card = new TPDCard(context, new StringBuffer(cardNumber), new StringBuffer(dueMonth), new StringBuffer(dueYear), new StringBuffer(CCV))
-            .onSuccessCallback((prime, tpdCardInfo, cardIdentifier) -> result.success(prime))
+            .onSuccessCallback((prime, tpdCardInfo, cardIdentifier) -> {
+              this.cardInfo = tpdCardInfo;
+              result.success(prime);
+            })
             .onFailureCallback((status, reportMsg) -> result.error(String.valueOf(status),reportMsg,null));
+
 
     card.createToken("UNKNOWN");
   }
