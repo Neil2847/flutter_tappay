@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 
-import 'package:flutter/services.dart';
 import 'package:tappay/tappay.dart';
 import 'package:tappay/model/credit_card.dart';
 
@@ -21,11 +20,13 @@ class _MyAppState extends State<MyApp> {
     String platformVersion;
     try {
       var tappa = TapPay();
-      tappa.initTapPay(0,'');
+      tappa.initTapPay(0, '');
       tappa.cardValid(CreditCard("", "", "", ""));
+      platformVersion = await tappa.getToken(CreditCard("", "", "", ""));
 
-      platformVersion = await tappa
-          .getToken(CreditCard("", "", "", ""));
+      print('$platformVersion');
+      print('${await tappa.getLastFour()}');
+      print('${await tappa.getCardType()}');
     } catch (e) {
       print('$e');
       platformVersion = 'Failed to get platform version.';
