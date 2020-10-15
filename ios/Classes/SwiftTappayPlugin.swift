@@ -19,15 +19,15 @@ public class SwiftTappayPlugin: NSObject, FlutterPlugin {
         case "initTapPay":
             self.initTapPay()
             break
-        case "validCard":
+        case "cardValid":
             let argsArr = call.arguments as? Dictionary<String,AnyObject>
             
-            self.validCard(number: argsArr?["number"] as! String, dueMonth: argsArr?["dueMonth"] as! String, dueYear: argsArr!["dueYear"] as! String, CCV: argsArr?["CCV"] as! String,flutterResult: result)
+            self.validCard(number: argsArr?["cardNumber"] as! String, dueMonth: argsArr?["dueMonth"] as! String, dueYear: argsArr!["dueYear"] as! String, CCV: argsArr?["CCV"] as! String,flutterResult: result)
             break
-        case "getTapPayToken":
+        case "getDirectPayToken":
             let argsArr = call.arguments as? Dictionary<String,AnyObject>
-            
-            self.getTapPayToken(number: argsArr?["number"] as! String, dueMonth: argsArr?["dueMonth"] as! String, dueYear: argsArr!["dueYear"] as! String, CCV: argsArr?["CCV"] as! String,flutterResult: result)
+
+            self.getTapPayToken(number: argsArr?["cardNumber"] as! String, dueMonth: argsArr?["dueMonth"] as! String, dueYear: argsArr!["dueYear"] as! String, CCV: argsArr?["CCV"] as! String,flutterResult: result)
             break
         case "cardType":
             if(cardType != 0){
@@ -40,6 +40,9 @@ public class SwiftTappayPlugin: NSObject, FlutterPlugin {
             }
             break
         default:
+            result(FlutterError(code: "-1",
+            message: "NotFind",
+            details: nil))
             break
         }
     }
