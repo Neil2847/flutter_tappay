@@ -36,4 +36,14 @@ class TapPay {
       'CCV': card.ccv
     });
   }
+
+  // -------------------------------------------
+  Future<int> getCardType() async {
+    return await _channel.invokeMethod('cardType');
+  }
+
+  // -------------------------------------------
+  Future<String> getLastFour() async {
+    return await _channel.invokeMethod('lastFour');
+  }
 }
