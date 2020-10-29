@@ -20,13 +20,19 @@ class _MyAppState extends State<MyApp> {
     String platformVersion;
     try {
       var tappa = TapPay();
-      tappa.initTapPay(0, "");
+      // tappa.initTapPay(0, "");
       // tappa.cardValid(CreditCard("", "", "", ""));
-      platformVersion = await tappa.getToken(CreditCard("", "", "", ""));
+      // platformVersion = await tappa.getToken(CreditCard("", "", "", ""));
+
+      tappa.initTapPay(15365,
+          'app_6uJFBW6tnKWuC9oSJNyelqbl44ycRKgtzHJGQwaSCRv0wz2a0EysGLIirrW8');
+      platformVersion = await tappa
+          .getToken(CreditCard("4242424242424242", "01", "23", "123"));
 
       print('$platformVersion');
-      print('${await tappa.getLastFour()}');
-      print('${await tappa.getCardType()}');
+      // print('${await tappa.getLastFour()}');
+      // print('${await tappa.getCardType()}');
+      print('${await tappa.getIdentifier()}');
     } catch (e) {
       print('$e');
       platformVersion = 'Failed to get platform version.';

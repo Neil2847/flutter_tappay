@@ -38,6 +38,11 @@ class TapPay {
   }
 
   // -------------------------------------------
+  Future<String> getIdentifier() async {
+    return await _channel.invokeMethod('identifier');
+  }
+
+  // -------------------------------------------
   Future<int> getCardType() async {
     return await _channel.invokeMethod('cardType');
   }
