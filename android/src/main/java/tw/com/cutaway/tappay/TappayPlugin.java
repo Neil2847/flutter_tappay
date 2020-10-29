@@ -27,10 +27,12 @@ public class TappayPlugin implements FlutterPlugin, MethodCallHandler {
   private static final String GET_TOKEN = "getDirectPayToken";
   private static final String CARD_TYPE = "cardType";
   private static final String LAST_FOUR = "lastFour";
+  private static final String IDENTIFIER = "identifier";
 
   private Context context;
   private MethodChannel channel;
   private TPDCardInfo cardInfo;
+  private String cardIdentifier;
 
   // ----------------------------------
   public static void registerWith(Registrar registrar) {
@@ -75,12 +77,23 @@ public class TappayPlugin implements FlutterPlugin, MethodCallHandler {
       case CARD_TYPE:
         if(cardInfo!=null){
           result.success(cardInfo.getCardType());
+          return;
         }
+        result.error("-5","Not get card type.",null);
         break;
       case LAST_FOUR:
         if(cardInfo!=null){
           result.success(cardInfo.getLastFour());
+          return;
         }
+        result.error("-6","Not get card information.",null);
+        break;
+      case IDENTIFIER:
+        if(cardIdentifier!=null && !cardIdentifier.isEmpty()){
+          result.success(cardIdentifier);
+          return;
+        }
+        result.error("-4","Not get card identifier",null);
         break;
       default:
         result.notImplemented();
@@ -123,9 +136,9 @@ public class TappayPlugin implements FlutterPlugin, MethodCallHandler {
     if (validResult.isCardNumberValid()){
       result.error("-1","Invalid Card Number",null);
     }else if (validResult.isExpiryDateValid()){
-      result.error("-1","Invalid Expiration Date",null);
+      result.error("-2","Invalid Expiration Date",null);
     }else if (validResult.isCCVValid()){
-      result.error("-1","Invalid CCV",null);
+      result.error("-3","Invalid CCV",null);
     }else {
       result.success(true);
     }
@@ -136,6 +149,7 @@ public class TappayPlugin implements FlutterPlugin, MethodCallHandler {
     TPDCard card = new TPDCard(context, new StringBuffer(cardNumber), new StringBuffer(dueMonth), new StringBuffer(dueYear), new StringBuffer(CCV))
             .onSuccessCallback((prime, tpdCardInfo, cardIdentifier) -> {
               this.cardInfo = tpdCardInfo;
+              this.cardIdentifier = cardIdentifier;
               result.success(prime);
             })
             .onFailureCallback((status, reportMsg) -> result.error(String.valueOf(status),reportMsg,null));
