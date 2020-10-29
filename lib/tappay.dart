@@ -4,14 +4,21 @@ import 'package:flutter/services.dart';
 
 import 'model/credit_card.dart';
 
+enum ServerType { TEST, RELEASE }
+
 class TapPay {
   static const MethodChannel _channel = const MethodChannel('tappay/bridge');
 
   // -------------------------------------------
-  void initTapPay(int id, String appKey) async {
+  int getType(ServerType type) {
+    return type == ServerType.TEST ? 0 : 1;
+  }
+
+  // -------------------------------------------
+  void initTapPay(int id, String appKey, ServerType type) async {
     try {
-      await _channel
-          .invokeMethod('initTapPay', {"appId": id, "appKey": appKey});
+      await _channel.invokeMethod(
+          'initTapPay', {"appId": id, "appKey": appKey, "type": getType(type)});
     } catch (e) {
       print(e);
     }
