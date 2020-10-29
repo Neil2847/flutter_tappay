@@ -6,6 +6,7 @@ public class SwiftTappayPlugin: NSObject, FlutterPlugin {
     
     var cardType:Int = 0
     var lastFour:String = ""
+    var cardIdentifier:String = ""
     
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "tappay/bridge", binaryMessenger: registrar.messenger())
@@ -33,12 +34,29 @@ public class SwiftTappayPlugin: NSObject, FlutterPlugin {
         case "cardType":
             if(cardType != 0){
                 result(cardType)
+                return
             }
+            result(FlutterError(code: "-5",
+            message: "Not get card type.",
+            details: nil))
             break
         case "lastFour":
             if(lastFour.count > 0){
                 result(lastFour)
+                return
             }
+            result(FlutterError(code: "-6",
+            message: "Not get card information.",
+            details: nil))
+            break
+        case "identifier":
+            if(cardIdentifier.count > 0){
+                result(cardIdentifier)
+                return
+            }
+            result(FlutterError(code: "-4",
+            message: "Not get card identifier.",
+            details: nil))
             break
         default:
             result(FlutterError(code: "-1",
@@ -64,11 +82,11 @@ public class SwiftTappayPlugin: NSObject, FlutterPlugin {
                                            message: "Invalid Card Number.",
                                            details: nil))
             }else if(result!.isExpiryDateValid){
-                flutterResult(FlutterError(code: "-1",
+                flutterResult(FlutterError(code: "-2",
                                            message: "Invalid Expiration Date.",
                                            details: nil))
             }else if((result?.isCCVValid) != nil){
-                flutterResult(FlutterError(code: "-1",
+                flutterResult(FlutterError(code: "-3",
                                            message: "Invalid CCV.",
                                            details: nil))
             }else{
@@ -90,6 +108,7 @@ public class SwiftTappayPlugin: NSObject, FlutterPlugin {
             .onSuccessCallback { (prime, cardInfo, cardIdentifier) in
                 self.cardType = cardInfo?.cardType ?? 0
                 self.lastFour = cardInfo?.lastFour ?? ""
+                self.cardIdentifier = cardIdentifier ?? ""
                 flutterResult(prime)
         }
         .onFailureCallback { (status, errorMessage) in
