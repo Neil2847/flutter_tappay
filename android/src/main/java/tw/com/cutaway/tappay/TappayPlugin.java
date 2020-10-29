@@ -60,8 +60,8 @@ public class TappayPlugin implements FlutterPlugin, MethodCallHandler {
 
     switch (call.method){
       case INIT:
-        if (hasValue(call,"appId","appKey")){
-          initTapPay(call.argument("appId"),call.argument("appKey"));
+        if (hasValue(call,"appId","appKey","type")){
+          initTapPay(call.argument("appId"),call.argument("appKey"),call.argument("type"));
         }
         break;
       case VALID:
@@ -126,8 +126,8 @@ public class TappayPlugin implements FlutterPlugin, MethodCallHandler {
   }
 
   // ----------------------------------
-  private void initTapPay(int appId,String appKey){
-    TPDSetup.initInstance(context, appId, appKey, TPDServerType.Sandbox);
+  private void initTapPay(int appId,String appKey,int type){
+    TPDSetup.initInstance(context, appId, appKey, type ==0 ?TPDServerType.Sandbox:TPDServerType.Production);
   }
 
   // ----------------------------------

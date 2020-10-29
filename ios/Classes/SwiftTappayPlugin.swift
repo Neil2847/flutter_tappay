@@ -19,7 +19,7 @@ public class SwiftTappayPlugin: NSObject, FlutterPlugin {
         switch call.method {
         case "initTapPay":
              let args = call.arguments as? Dictionary<String,AnyObject>
-             self.initTapPay(id:args?["appId"] as! Int32,token:args?["appKey"] as! String)
+             self.initTapPay(id:args?["appId"] as! Int32,token:args?["appKey"] as! String,type: args?["type"] as! Int32)
             break
         case "cardValid":
             let argsArr = call.arguments as? Dictionary<String,AnyObject>
@@ -67,8 +67,9 @@ public class SwiftTappayPlugin: NSObject, FlutterPlugin {
     }
     
     
-    func initTapPay(id :Int32,token :String){
-        TPDSetup.setWithAppId(id, withAppKey: token, with: TPDServerType.sandBox)
+    func initTapPay(id :Int32,token :String,type :Int32){
+        let serverType = type == 0 ? TPDServerType.sandBox : TPDServerType.production
+        TPDSetup.setWithAppId(id, withAppKey: token, with: serverType)
         //    TPDSetup.shareInstance().setupIDFA(ASIdentifierManager.shared().advertisingIdentifier.uuidString)
         TPDSetup.shareInstance().serverSync()
     }
